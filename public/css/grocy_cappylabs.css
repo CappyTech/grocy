@@ -284,8 +284,8 @@ a.card, .card.cursor-link, .grocy-card.cursor-link {
 	background-color: rgba(255, 255, 255, 0.018);
 }
 
-.table-hover tbody tr:hover,
-.night-mode .table-hover tbody tr:hover {
+.table tbody tr:hover,
+.night-mode .table tbody tr:hover {
 	background-color: var(--cl-raised);
 	color: var(--cl-text);
 }
@@ -901,6 +901,130 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--cl-cyan); }
 
 @keyframes cl-led { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
 .cl-led { animation: cl-led 2.6s ease-in-out infinite; color: var(--cl-green); }
+
+/* ── Hover ────────────────────────────────────────────────────────────────── */
+
+/* Bootstrap ships a *light* hover colour for every contextual surface --
+   .table-warning:hover is #ffe8a1, .table-info:hover #abdde5, and so on -- and
+   those selectors carry three classes, outranking a plain
+   a plain row-hover rule. The result on a dark theme is a pale flash
+   under the cursor on exactly the rows that carry status.
+   Every light hover Bootstrap defines is restated here in one place.
+
+   These rules deliberately do NOT depend on `.table-hover`. Grocy never puts
+   that class on its data tables -- the stock table is
+   `table table-sm table-striped nowrap w-100 dataTable no-footer` -- so rows
+   had no hover feedback at all, while dropdowns and list items did. In a grid
+   this dense that is where you lose your place scanning across columns.
+
+   Rule: hover deepens the surface it is on. A tinted row keeps its status hue
+   and gets stronger; a plain row lifts to --cl-raised. Hover never changes
+   what a colour means. */
+
+.table tbody tr:hover,
+.table tbody tr:hover > td,
+.table tbody tr:hover > th {
+	background-color: var(--cl-raised);
+	color: var(--cl-text);
+}
+
+.table .table-warning:hover,
+.table .table-warning:hover > td,
+.table .table-warning:hover > th {
+	background-color: rgba(232, 161, 60, 0.24) !important;
+}
+.table .table-danger:hover,
+.table .table-danger:hover > td,
+.table .table-danger:hover > th {
+	background-color: rgba(226, 104, 106, 0.24) !important;
+}
+.table .table-info:hover,
+.table .table-info:hover > td,
+.table .table-info:hover > th,
+.table .table-primary:hover,
+.table .table-primary:hover > td,
+.table .table-primary:hover > th {
+	background-color: rgba(95, 184, 196, 0.24) !important;
+}
+.table .table-success:hover,
+.table .table-success:hover > td,
+.table .table-success:hover > th {
+	background-color: rgba(126, 203, 126, 0.24) !important;
+}
+.table .table-secondary:hover,
+.table .table-secondary:hover > td,
+.table .table-secondary:hover > th,
+.table .table-light:hover,
+.table .table-light:hover > td,
+.table .table-light:hover > th {
+	background-color: rgba(111, 141, 144, 0.26) !important;
+	color: var(--cl-text) !important;
+}
+.table-active,
+.table .table-active:hover,
+.table .table-active:hover > td,
+.table .table-active:hover > th {
+	background-color: var(--cl-raised) !important;
+}
+
+/* List groups and pagination hover to #f8f9fa / #e9ecef by default. */
+.list-group-item {
+	background-color: var(--cl-surface);
+	border-color: var(--cl-border);
+	color: var(--cl-text);
+}
+.list-group-item-action:hover,
+.list-group-item-action:focus,
+.list-group-item-danger.list-group-item-action:hover,
+.list-group-item-light.list-group-item-action:hover,
+.list-group-item-secondary.list-group-item-action:hover,
+.list-group-item-warning.list-group-item-action:hover {
+	background-color: var(--cl-raised);
+	color: var(--cl-text);
+}
+.list-group-item.active {
+	background-color: var(--cl-raised);
+	border-color: var(--cl-cyan);
+	color: var(--cl-text);
+}
+
+.page-link {
+	background-color: var(--cl-surface);
+	border-color: var(--cl-border);
+	color: var(--cl-muted);
+}
+.page-link:hover,
+.page-link:focus {
+	background-color: var(--cl-raised);
+	border-color: var(--cl-border);
+	color: var(--cl-text);
+}
+.page-item.active .page-link {
+	background-color: var(--cl-cyan);
+	border-color: var(--cl-cyan);
+	color: #08171b;
+}
+.page-item.disabled .page-link {
+	background-color: var(--cl-surface);
+	border-color: var(--cl-border);
+	color: var(--cl-muted);
+}
+
+/* Utility hovers used on linked badges and backgrounds. */
+a.bg-light:hover, a.bg-light:focus,
+a.bg-warning:hover, a.bg-warning:focus {
+	background-color: var(--cl-raised) !important;
+	color: var(--cl-text) !important;
+}
+a.badge-light:hover, a.badge-light:focus { background-color: var(--cl-raised); color: var(--cl-text); }
+a.badge-warning:hover, a.badge-warning:focus { background-color: rgba(232, 161, 60, 0.3); color: var(--cl-amber); }
+
+/* DataTables paints its own row stripes and hover on top of .table-hover. */
+table.dataTable.hover tbody tr:hover,
+table.dataTable.display tbody tr:hover,
+table.dataTable tbody tr:hover > .sorting_1 {
+	background-color: var(--cl-raised) !important;
+}
 
 /* ── Focus ────────────────────────────────────────────────────────────────── */
 
