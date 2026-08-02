@@ -728,6 +728,14 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--cl-cyan); }
 
 /* Upstream gives these pale pastel fills with dark text, which glare on the
    dark ground. Same idea -- coloured top rule, tinted body -- inverted. */
+/* These are rendered empty and filled in by JS only when a count is non-zero.
+   Padding plus a tinted fill turns an empty one into a stray coloured stub --
+   visible upstream too, but far more obvious on the dark ground. :empty is
+   re-evaluated when JS inserts the text, so populated pills still appear. */
+.status-filter-message:empty {
+	display: none;
+}
+
 .warning-message,
 .error-message,
 .normal-message,
