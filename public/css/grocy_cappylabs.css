@@ -19,6 +19,13 @@
    ========================================================================== */
 
 :root {
+	/* Tells the browser to render everything it draws itself in dark: the
+	   <select> dropdown popup, date/time pickers, autofill, spinners, default
+	   scrollbars. Page CSS cannot reach those -- a <select> can be styled dark
+	   and still open a white system popup, which is exactly what happened
+	   before this line existed. Not a preference; the theme is dark only. */
+	color-scheme: dark;
+
 	--cl-bg: #0e1a1f;
 	--cl-surface: #14252c;
 	--cl-raised: #193037;
@@ -403,6 +410,42 @@ table.dataTable.row-border tbody th, table.dataTable.row-border tbody td {
 }
 
 .form-control::placeholder { color: var(--cl-muted); opacity: 0.7; }
+
+/* Belt and braces alongside color-scheme: browsers that honour option colours
+   get the theme surface rather than a transparent option on a system-white
+   popup. optgroup labels otherwise inherit a bold system style. */
+select,
+select.form-control,
+select.custom-select {
+	background-color: var(--cl-bg);
+	color: var(--cl-text);
+}
+select option,
+select optgroup {
+	background-color: var(--cl-surface);
+	color: var(--cl-text);
+}
+select option:checked,
+select option:hover {
+	background-color: var(--cl-raised);
+	color: var(--cl-text);
+}
+select optgroup {
+	font-family: var(--cl-mono);
+	font-size: var(--cl-mono-micro);
+	letter-spacing: var(--cl-track);
+	text-transform: uppercase;
+	color: var(--cl-muted);
+}
+
+/* The custom-select arrow is a data-URI SVG with a dark stroke baked in --
+   same trap as the navbar hamburger, unreachable via `color`. */
+.custom-select {
+	background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3e%3cpath fill='%236f8d90' d='M2 0L0 2h4zm0 5L0 3h4z'/%3e%3c/svg%3e");
+	background-repeat: no-repeat;
+	background-position: right 0.75rem center;
+	background-size: 8px 10px;
+}
 .form-control:disabled, .form-control[readonly] {
 	background-color: var(--cl-surface);
 	color: var(--cl-muted);
