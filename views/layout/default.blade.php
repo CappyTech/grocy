@@ -99,11 +99,17 @@
 	<link href="{{ $U('/css/grocy.css?v=', true) }}{{ $version }}"
 		rel="stylesheet">
 
-	@if(boolval($userSettings['night_mode_enabled_internal']))
-	<link id="night-mode-stylesheet"
-		href="{{ $U('/css/grocy_night_mode.css?v=', true) }}{{ $version }}"
-		rel="stylesheet">
-	@endif
+	{{-- grocy_night_mode.css is deliberately NOT loaded.
+
+	     The Cappy Labs theme below is dark unconditionally, so night mode has
+	     nothing left to add -- but it has 105 `.night-mode X` rules which
+	     outrank the theme's unprefixed equivalents on specificity, so with it
+	     loaded the app looked different, and worse, with the toggle on.
+	     Chasing that with 105 counter-rules would be endless; not loading a
+	     second, competing dark theme is the actual fix.
+
+	     The `night-mode` body class below is still emitted, so the setting is
+	     preserved and any `.night-mode` rule in the theme keeps matching. --}}
 
 	{{-- Cappy Labs theme. MUST stay last: night mode above is conditional, and
 	     this file is what makes the app look the same with it on or off. --}}

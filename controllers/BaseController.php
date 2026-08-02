@@ -27,7 +27,16 @@ class BaseController
 		$container = $this->AppContainer;
 
 		$versionInfo = ApplicationService::GetInstance()->GetInstalledVersion();
-		$this->View->set('version', $versionInfo->Version);
+
+		// `version` is used ONLY as the ?v= cache-buster on asset URLs -- the
+		// About page reads $versionInfo->Version separately, so nothing displayed
+		// changes here. This fork edits CSS and JS while version.json stays put,
+		// so on stock grocy every build reuses ?v=4.6.0 and browsers keep serving
+		// the stylesheet they cached first. Appending the build commit makes each
+		// image's assets a distinct URL, so changes actually reach people without
+		// a manual hard refresh.
+		$buildId = getenv('GIT_COMMIT');
+		$this->View->set('version', $versionInfo->Version . ($buildId ? '-' . $buildId : ''));
 
 		$localizationService = LocalizationService::GetInstance();
 		$this->View->set('__t', function (string $text, ...$placeholderValues) use ($localizationService)
