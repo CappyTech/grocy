@@ -28,7 +28,7 @@ msgid "summernote_locale"
 msgstr "x"
 
 msgid "fullcalendar_locale"
-msgstr "x"
+msgstr "en-gb"
 
 msgid "bootstrap-select_locale"
 msgstr "x"

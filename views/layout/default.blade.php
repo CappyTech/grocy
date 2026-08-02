@@ -1,7 +1,11 @@
 @php global $GROCY_REQUIRED_FRONTEND_PACKAGES; @endphp
 
 <!DOCTYPE html>
-<html lang="{{ GROCY_LOCALE }}"
+{{-- GROCY_LOCALE is a directory name using an underscore (en_GB, pt_BR).
+     lang= must be a BCP 47 tag, which uses a hyphen, or user agents ignore it
+     entirely -- affecting screen reader pronunciation, browser translation
+     offers, hyphenation and :lang() matching. --}}
+<html lang="{{ str_replace('_', '-', GROCY_LOCALE) }}"
 	dir="{{ $dir }}">
 
 <head>
