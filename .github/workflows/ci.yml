@@ -87,17 +87,17 @@ jobs:
           test "$code" = "200" || { echo "app did not become ready (last=$code)"; exit 1; }
 
           body=$(curl -sL http://127.0.0.1:8099/)
-          echo "$body" | grep -q "Grocy.Currency = 'GBP'" \
+          grep -q "Grocy.Currency = 'GBP'" <<< "$body" \
             || { echo "GROCY_CURRENCY not applied"; exit 1; }
           # --- guards for this fork's en_GB patches ---
           # Upstream ships moment_locale/fullcalendar_locale as "x", which makes
           # the layout emit no locale file at all and silently reverts dates to
           # US format. Assert the effect, not just the file.
-          echo "$body" | grep -q "moment/locale/en-gb.js" \
+          grep -q "moment/locale/en-gb.js" <<< "$body" \
             || { echo "en_GB moment locale missing -- the fork patch regressed"; exit 1; }
           curl -sf -o /dev/null http://127.0.0.1:8099/packages/moment/locale/en-gb.js \
             || { echo "en-gb.js not served -- yarn stage output missing"; exit 1; }
-          echo "$body" | grep -q '<html lang="en-GB"' \
+          grep -q '<html lang="en-GB"' <<< "$body" \
             || { echo "lang attribute is not the BCP 47 form en-GB"; exit 1; }
 
           # fullcalendar only loads on views that require it, so this needs a
@@ -106,7 +106,7 @@ jobs:
           curl -s -c /tmp/cj -o /dev/null -X POST \
             -d 'username=admin&password=admin' http://127.0.0.1:8099/login
           cal=$(curl -s -b /tmp/cj -L http://127.0.0.1:8099/calendar)
-          echo "$cal" | grep -q "fullcalendar/dist/locale/en-gb.js" \
+          grep -q "fullcalendar/dist/locale/en-gb.js" <<< "$cal" \
             || { echo "en_GB fullcalendar locale missing on /calendar"; exit 1; }
 
           echo "smoke test passed"
