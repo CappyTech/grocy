@@ -185,6 +185,16 @@ hr { border-top-color: var(--cl-border); }
 	border-color: var(--cl-border);
 }
 
+/* The hamburger is a background-image SVG with the stroke colour baked in, so
+   `color` does not reach it -- Bootstrap's .navbar-light version strokes
+   rgba(0,0,0,.5), i.e. a black icon on a dark bar. Restated with the theme's
+   text colour. (grocy_night_mode.css used to patch this; the theme owns it
+   now that the night stylesheet is not loaded.) */
+.navbar-light .navbar-toggler-icon,
+#mainNav .navbar-toggler-icon {
+	background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28221, 233, 231, 0.85%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
 /* Below lg the sidebar rail becomes a drop-down panel over the page. The
    translucent bar that works for a thin fixed header does not work for a
    full-height menu: tinted table rows read straight through it. Opaque here,
@@ -875,6 +885,54 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--cl-cyan); }
    plain hue-rotate on the blue barely shifts it. */
 #mainNav .navbar-brand img {
 	filter: grayscale(1) brightness(1.15) sepia(1) hue-rotate(140deg) saturate(2.6);
+}
+
+/* ── Remaining surfaces the night stylesheet used to own ──────────────────── */
+
+/* grocy_night_mode.css is no longer loaded (see the layout), so anything it
+   was patching and the theme was not is now Bootstrap's light default. These
+   are the ones that applied. */
+
+.container-fluid { background-color: transparent; }
+
+.card-title { color: var(--cl-text); }
+.card-body .shadow { box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45) !important; }
+
+.dropdown-item-text { color: var(--cl-text); background-color: transparent; }
+
+.img-thumbnail,
+.note-editor.note-frame .note-statusbar {
+	background-color: var(--cl-surface);
+	border-color: var(--cl-border);
+	color: var(--cl-text);
+}
+
+.custom-file-input,
+.custom-file-label,
+.custom-file-label::after {
+	background-color: var(--cl-bg);
+	border-color: var(--cl-border);
+	color: var(--cl-text);
+}
+
+.bg-info    { background-color: rgba(95, 184, 196, 0.16) !important; }
+.bg-danger  { background-color: rgba(226, 104, 106, 0.16) !important; }
+.bg-success { background-color: rgba(126, 203, 126, 0.16) !important; }
+.bg-warning { background-color: rgba(232, 161, 60, 0.16) !important; }
+.bg-primary { background-color: rgba(95, 184, 196, 0.16) !important; }
+.bg-dark    { background-color: var(--cl-surface) !important; }
+
+a.text-dark { color: var(--cl-muted) !important; }
+a.text-dark:hover { color: var(--cl-text) !important; }
+
+/* QR codes and barcodes are scanned by a camera, which needs light-on-dark
+   inverted back. Keep the light plate -- this is function, not decoration. */
+.qr-code,
+.grocycode,
+img[src*="barcode"] {
+	background-color: #eee;
+	padding: min(1.5vw, 20px);
+	border-radius: var(--cl-radius);
 }
 
 /* ── Section-label motif ──────────────────────────────────────────────────── */
