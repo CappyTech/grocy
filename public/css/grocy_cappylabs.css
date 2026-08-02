@@ -1,0 +1,845 @@
+/* ============================================================================
+   Cappy Labs theme for grocy
+   ----------------------------------------------------------------------------
+   Fork-owned. Loaded LAST, after grocy.css and grocy_night_mode.css, so it wins
+   on equal specificity without editing any upstream stylesheet -- that keeps
+   `git merge upstream/master` clean.
+
+   Design language taken from cappylabs.uk: dark teal ground with a graph-paper
+   grid, Space Grotesk for UI, IBM Plex Mono for uppercase micro-labels, cyan as
+   the primary accent and amber reserved for emphasis and hover.
+
+   This is a DARK theme applied unconditionally. Grocy's own night mode is a
+   separate `body.night-mode` class; because this file loads after it, the
+   look is the same whether that toggle is on or off. Where night mode would
+   otherwise re-light a surface, it is neutralised below.
+
+   Grocy has no CSS custom properties -- colours are hard-coded hex throughout
+   upstream. The variables here are ours; change a value once and it propagates.
+   ========================================================================== */
+
+:root {
+	--cl-bg: #0e1a1f;
+	--cl-surface: #14252c;
+	--cl-raised: #193037;
+	--cl-text: #dde9e7;
+	--cl-muted: #6f8d90;
+	--cl-cyan: #5fb8c4;
+	--cl-amber: #e8a13c;
+	--cl-green: #7ecb7e;
+	--cl-red: #e2686a;
+	--cl-border: rgba(255, 255, 255, 0.08);
+	--cl-border-strong: rgba(255, 255, 255, 0.16);
+
+	--cl-sans: "Space Grotesk", system-ui, -apple-system, sans-serif;
+	--cl-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+	--cl-radius: 10px;
+	--cl-radius-sm: 4px;
+}
+
+/* ── Base ─────────────────────────────────────────────────────────────────── */
+
+body,
+body.night-mode {
+	background-color: var(--cl-bg);
+	color: var(--cl-text);
+	font-family: var(--cl-sans);
+	/* 48px graph paper plus a cyan glow from above, as on cappylabs.uk.
+	   background-attachment keeps the grid still while content scrolls. */
+	background-image:
+		linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+		linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+		radial-gradient(ellipse at 50% -10%, rgba(95, 184, 196, 0.07), transparent 60%);
+	background-size: 48px 48px, 48px 48px, 100% 100%;
+	background-attachment: fixed;
+}
+
+.content-wrapper,
+.content-text {
+	background-color: transparent;
+	color: var(--cl-text);
+}
+
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6 {
+	font-family: var(--cl-sans);
+	font-weight: 500;
+	letter-spacing: -0.015em;
+	color: var(--cl-text);
+}
+
+h1, .h1 { font-weight: 700; letter-spacing: -0.03em; }
+
+a { color: var(--cl-cyan); }
+a:hover, a:focus { color: var(--cl-amber); }
+
+/* Grocy uses .discrete-link for nav and menu entries that should not read as
+   links; keep them inheriting rather than turning cyan. */
+a.discrete-link,
+a.discrete-link:hover {
+	color: inherit;
+}
+
+hr { border-top-color: var(--cl-border); }
+
+.text-muted { color: var(--cl-muted) !important; }
+.text-primary { color: var(--cl-cyan) !important; }
+.text-success { color: var(--cl-green) !important; }
+.text-warning { color: var(--cl-amber) !important; }
+.text-danger  { color: var(--cl-red) !important; }
+.text-dark, .text-body, .text-black-50 { color: var(--cl-text) !important; }
+
+::selection { background: rgba(95, 184, 196, 0.3); }
+
+/* ── Scrollbars ───────────────────────────────────────────────────────────── */
+
+* { scrollbar-color: var(--cl-raised) transparent; scrollbar-width: thin; }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+	background: var(--cl-raised);
+	border-radius: 6px;
+	border: 2px solid transparent;
+	background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover { background-color: var(--cl-muted); background-clip: content-box; }
+
+/* ── Top bar and sidebar ──────────────────────────────────────────────────── */
+
+#mainNav,
+#mainNav.navbar-light,
+#mainNav.fixed-top {
+	background-color: rgba(14, 26, 31, 0.92) !important;
+	backdrop-filter: blur(8px);
+	border-bottom: 1px solid var(--cl-border);
+}
+
+#mainNav .navbar-brand {
+	font-family: var(--cl-mono);
+	font-size: 13px;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	color: var(--cl-text);
+}
+
+#mainNav .navbar-collapse { background-color: transparent; }
+
+/* Sidebar rail. The upstream selectors are deep, so these match that weight
+   rather than leaning on !important. */
+#mainNav.navbar-light .navbar-collapse .navbar-sidenav > .nav-item > .nav-link,
+#mainNav .navbar-collapse .navbar-nav .nav-item .nav-link {
+	color: var(--cl-muted);
+	border-left: 2px solid transparent;
+	transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+}
+
+#mainNav.navbar-light .navbar-collapse .navbar-sidenav > .nav-item > .nav-link:hover,
+#mainNav .navbar-collapse .navbar-nav .nav-item .nav-link:hover,
+#mainNav .navbar-collapse .navbar-nav .nav-item .nav-link:focus {
+	color: var(--cl-text);
+	background-color: var(--cl-surface);
+	border-left-color: var(--cl-amber);
+}
+
+/* Current page. Grocy marks it with .active on the nav-item or link. */
+#mainNav .navbar-collapse .navbar-nav .nav-item.active > .nav-link,
+#mainNav .navbar-collapse .navbar-nav .nav-item > .nav-link.active {
+	color: var(--cl-text);
+	background-color: var(--cl-surface);
+	border-left-color: var(--cl-cyan);
+}
+
+#mainNav .navbar-collapse .navbar-sidenav .sidenav-second-level > li > a,
+#mainNav .navbar-collapse .navbar-sidenav .sidenav-third-level > li > a {
+	color: var(--cl-muted);
+}
+#mainNav .navbar-collapse .navbar-sidenav .sidenav-second-level > li > a:hover,
+#mainNav .navbar-collapse .navbar-sidenav .sidenav-third-level > li > a:hover {
+	color: var(--cl-text);
+	background-color: var(--cl-surface);
+}
+
+#mainNav.fixed-top .sidenav-toggler,
+#mainNav.fixed-top.navbar-light .sidenav-toggler {
+	background-color: var(--cl-surface);
+	border-top: 1px solid var(--cl-border);
+}
+#mainNav.fixed-top.navbar-light .sidenav-toggler a i { color: var(--cl-muted); }
+
+#mainNav .navbar-toggler {
+	color: var(--cl-text);
+	border-color: var(--cl-border);
+}
+
+.navbar-sidenav-tooltip.show .tooltip-inner {
+	background-color: var(--cl-raised);
+	color: var(--cl-text);
+	font-family: var(--cl-mono);
+	font-size: 11px;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+}
+
+/* ── Cards ────────────────────────────────────────────────────────────────── */
+
+.card,
+.grocy-card,
+.night-mode .card {
+	background-color: var(--cl-surface);
+	border: 1px solid var(--cl-border);
+	border-radius: var(--cl-radius);
+	color: var(--cl-text);
+}
+
+.card-header,
+.grocy-card .card-header,
+.night-mode .card-header {
+	background-color: transparent;
+	border-bottom: 1px solid var(--cl-border);
+	color: var(--cl-text);
+	font-family: var(--cl-mono);
+	font-size: 12px;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+}
+
+.card-footer { background-color: transparent; border-top: 1px solid var(--cl-border); }
+
+/* The lift-and-warm hover from the cappylabs module cards, applied only to
+   cards that are themselves links so static panels do not twitch. */
+a.card:hover,
+.card.cursor-link:hover,
+.grocy-card.cursor-link:hover {
+	transform: translateY(-3px);
+	border-color: rgba(232, 161, 60, 0.5);
+	background-color: var(--cl-raised);
+}
+a.card, .card.cursor-link, .grocy-card.cursor-link {
+	transition: transform 0.18s ease, border-color 0.18s ease, background-color 0.18s ease;
+}
+
+.grocy-card .card-icons i,
+.grocy-card .card-icons a { color: var(--cl-muted); }
+.grocy-card .card-icons a:hover i,
+.grocy-card .card-icons a:hover { color: var(--cl-amber); }
+
+/* ── Tables ───────────────────────────────────────────────────────────────── */
+
+.table,
+.table-bordered,
+.night-mode .table {
+	color: var(--cl-text);
+	border-color: var(--cl-border);
+}
+
+.table thead th,
+.table th {
+	font-family: var(--cl-mono);
+	font-size: 11px;
+	font-weight: 500;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--cl-muted);
+	border-bottom: 1px solid var(--cl-border) !important;
+	border-top: none;
+}
+
+.table td { border-top: 1px solid var(--cl-border); }
+
+.table-striped tbody tr:nth-of-type(odd),
+.night-mode .table-striped tbody tr:nth-of-type(odd) {
+	background-color: rgba(255, 255, 255, 0.018);
+}
+
+.table-hover tbody tr:hover,
+.night-mode .table-hover tbody tr:hover {
+	background-color: var(--cl-raised);
+	color: var(--cl-text);
+}
+
+/* Bootstrap contextual rows, restated on the dark ground. Upstream night mode
+   sets its own values for these; ours load later and win. */
+.table .table-success, .table-success > td, .table-success > th,
+.night-mode .table-success, .night-mode .table-success > td {
+	background-color: rgba(126, 203, 126, 0.14) !important;
+}
+.table .table-warning, .table-warning > td, .table-warning > th,
+.night-mode .table-warning, .night-mode .table-warning > td {
+	background-color: rgba(232, 161, 60, 0.14) !important;
+}
+.table .table-danger, .table-danger > td, .table-danger > th,
+.night-mode .table-danger, .night-mode .table-danger > td {
+	background-color: rgba(226, 104, 106, 0.14) !important;
+}
+.table .table-info, .table-info > td, .table-info > th,
+.night-mode .table-info, .night-mode .table-info > td,
+.night-mode .alert-info {
+	background-color: rgba(95, 184, 196, 0.14) !important;
+}
+/* Bootstrap's .table-secondary/.table-light are pale greys that read as blown
+   out on the dark ground -- grocy uses secondary for expired rows. */
+.table .table-secondary, .table-secondary > td, .table-secondary > th,
+.table .table-light, .table-light > td, .table-light > th,
+.night-mode .table-secondary, .night-mode .table-secondary > td {
+	background-color: rgba(111, 141, 144, 0.16) !important;
+	color: var(--cl-muted) !important;
+}
+
+/* DataTables chrome */
+.dataTables_wrapper .dataTables_length,
+.dataTables_wrapper .dataTables_filter,
+.dataTables_wrapper .dataTables_info,
+.dataTables_wrapper .dataTables_processing,
+.dataTables_wrapper .dataTables_paginate {
+	color: var(--cl-muted) !important;
+	font-family: var(--cl-mono);
+	font-size: 12px;
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+	color: var(--cl-muted) !important;
+	border-radius: var(--cl-radius-sm);
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button.current,
+.dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+	background: var(--cl-raised) !important;
+	border-color: var(--cl-border) !important;
+	color: var(--cl-text) !important;
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+	background: var(--cl-surface) !important;
+	border-color: var(--cl-border) !important;
+	color: var(--cl-text) !important;
+}
+table.dataTable tbody tr { background-color: transparent; }
+table.dataTable.row-border tbody th, table.dataTable.row-border tbody td {
+	border-top-color: var(--cl-border);
+}
+
+/* ── Forms ────────────────────────────────────────────────────────────────── */
+
+.form-control,
+.custom-select,
+.input-group-text,
+.night-mode .form-control {
+	background-color: var(--cl-bg);
+	border: 1px solid var(--cl-border);
+	border-radius: var(--cl-radius-sm);
+	color: var(--cl-text);
+	font-family: var(--cl-mono);
+	font-size: 13px;
+}
+
+.form-control:focus,
+.custom-select:focus {
+	background-color: var(--cl-bg);
+	border-color: rgba(95, 184, 196, 0.5);
+	box-shadow: 0 0 0 2px rgba(95, 184, 196, 0.15);
+	color: var(--cl-text);
+}
+
+.form-control::placeholder { color: var(--cl-muted); opacity: 0.7; }
+.form-control:disabled, .form-control[readonly] {
+	background-color: var(--cl-surface);
+	color: var(--cl-muted);
+}
+
+label, .col-form-label {
+	font-family: var(--cl-mono);
+	font-size: 11px;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--cl-muted);
+}
+
+/* Form-check and radio labels are sentence text, not field labels -- exempt
+   them so checkbox rows do not turn into shouting mono. */
+.form-check-label,
+.custom-control-label,
+.custom-file-label {
+	font-family: var(--cl-sans);
+	font-size: inherit;
+	letter-spacing: normal;
+	text-transform: none;
+	color: var(--cl-text);
+}
+
+input[type="checkbox"], input[type="radio"] { accent-color: var(--cl-cyan); }
+.custom-control-input:checked ~ .custom-control-label::before {
+	background-color: var(--cl-cyan);
+	border-color: var(--cl-cyan);
+}
+
+.input-group-text { color: var(--cl-muted); }
+.invalid-feedback { color: var(--cl-red); }
+.form-control.is-invalid { border-color: var(--cl-red); }
+
+.sticky-form-footer,
+.night-mode .sticky-form-footer {
+	background-color: rgba(20, 37, 44, 0.95);
+	backdrop-filter: blur(8px);
+	border-top: 1px solid var(--cl-border);
+	color: var(--cl-text);
+}
+
+/* ── Buttons ──────────────────────────────────────────────────────────────── */
+
+.btn {
+	font-family: var(--cl-mono);
+	font-size: 12px;
+	letter-spacing: 0.05em;
+	text-transform: uppercase;
+	border-radius: var(--cl-radius-sm);
+	transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.btn-primary, .btn-info {
+	background-color: var(--cl-cyan);
+	border-color: var(--cl-cyan);
+	color: #08171b;
+	font-weight: 500;
+}
+.btn-primary:hover, .btn-info:hover,
+.btn-primary:focus, .btn-info:focus {
+	background-color: #7ccbd5;
+	border-color: #7ccbd5;
+	color: #08171b;
+}
+
+.btn-secondary, .btn-light, .btn-default {
+	background-color: var(--cl-raised);
+	border-color: var(--cl-border);
+	color: var(--cl-text);
+}
+.btn-secondary:hover, .btn-light:hover, .btn-default:hover {
+	background-color: var(--cl-surface);
+	border-color: var(--cl-border-strong);
+	color: var(--cl-text);
+}
+
+.btn-success { background-color: var(--cl-green); border-color: var(--cl-green); color: #0b1c0b; }
+.btn-success:hover { background-color: #96d996; border-color: #96d996; color: #0b1c0b; }
+
+.btn-warning { background-color: var(--cl-amber); border-color: var(--cl-amber); color: #21140a; }
+.btn-warning:hover { background-color: #f0b45f; border-color: #f0b45f; color: #21140a; }
+
+.btn-danger { background-color: var(--cl-red); border-color: var(--cl-red); color: #200a0b; }
+.btn-danger:hover { background-color: #ea8688; border-color: #ea8688; color: #200a0b; }
+
+.btn-dark { background-color: var(--cl-surface); border-color: var(--cl-border); color: var(--cl-text); }
+
+.btn-outline-primary { color: var(--cl-cyan); border-color: rgba(95, 184, 196, 0.5); background: transparent; }
+.btn-outline-primary:hover { background-color: var(--cl-cyan); border-color: var(--cl-cyan); color: #08171b; }
+.btn-outline-secondary { color: var(--cl-muted); border-color: var(--cl-border); background: transparent; }
+.btn-outline-secondary:hover { background-color: var(--cl-raised); color: var(--cl-text); border-color: var(--cl-border-strong); }
+.btn-outline-danger { color: var(--cl-red); border-color: rgba(226, 104, 106, 0.5); background: transparent; }
+.btn-outline-danger:hover { background-color: var(--cl-red); color: #200a0b; border-color: var(--cl-red); }
+
+.btn:focus, .btn:focus-visible {
+	box-shadow: 0 0 0 2px rgba(232, 161, 60, 0.6);
+	outline: none;
+}
+
+.btn-link { color: var(--cl-cyan); text-transform: none; font-family: var(--cl-sans); letter-spacing: normal; }
+.btn-link:hover { color: var(--cl-amber); }
+
+/* Inside tables these repeat on every row (consume 1 / consume all / open),
+   and solid fills at that density overwhelm the page. Tinted fill with
+   coloured text keeps them obviously actionable but quiet. Deliberately scoped
+   to tables so standalone CTAs -- the login button, form submits -- stay solid. */
+.table .btn-success,
+.table .btn-danger,
+.table .btn-info,
+.table .btn-primary {
+	background-color: rgba(255, 255, 255, 0.04);
+	border-color: var(--cl-border);
+	font-weight: 500;
+}
+.table .btn-success { color: var(--cl-green); }
+.table .btn-danger  { color: var(--cl-red); }
+.table .btn-info,
+.table .btn-primary { color: var(--cl-cyan); }
+
+.table .btn-success:hover { background-color: var(--cl-green); color: #0b1c0b; border-color: var(--cl-green); }
+.table .btn-danger:hover  { background-color: var(--cl-red);   color: #200a0b; border-color: var(--cl-red); }
+.table .btn-info:hover,
+.table .btn-primary:hover { background-color: var(--cl-cyan);  color: #08171b; border-color: var(--cl-cyan); }
+
+/* ── Dropdowns ────────────────────────────────────────────────────────────── */
+
+.dropdown-menu,
+#mainNav .dropdown-menu,
+.navbar-nav .dropdown-menu,
+.night-mode .dropdown-menu {
+	background-color: var(--cl-surface);
+	border: 1px solid var(--cl-border);
+	border-radius: var(--cl-radius);
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+	color: var(--cl-text);
+}
+
+.dropdown-item,
+.navbar-nav .dropdown-item,
+.night-mode .dropdown-item {
+	color: var(--cl-text);
+}
+.dropdown-item:hover,
+.dropdown-item:focus,
+.navbar-nav .dropdown-item:hover {
+	background-color: var(--cl-raised);
+	color: var(--cl-text);
+}
+.dropdown-divider { border-top-color: var(--cl-border); }
+.dropdown-header {
+	font-family: var(--cl-mono);
+	font-size: 11px;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--cl-muted);
+}
+
+/* ── Modals, popovers, tooltips ───────────────────────────────────────────── */
+
+.modal-content,
+.night-mode .modal-content {
+	background-color: var(--cl-surface);
+	border: 1px solid var(--cl-border);
+	border-radius: var(--cl-radius);
+	color: var(--cl-text);
+}
+.modal-header, .modal-footer { border-color: var(--cl-border); }
+.modal-title {
+	font-family: var(--cl-mono);
+	font-size: 13px;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+}
+.modal-backdrop.show { opacity: 0.7; background-color: #050c0f; }
+.close, .close:hover { color: var(--cl-text); text-shadow: none; opacity: 0.7; }
+
+.popover, .bootbox .modal-content {
+	background-color: var(--cl-surface);
+	border-color: var(--cl-border);
+	color: var(--cl-text);
+}
+.popover-header { background-color: var(--cl-raised); border-bottom-color: var(--cl-border); color: var(--cl-text); }
+.popover-body { color: var(--cl-text); }
+
+.tooltip-inner {
+	background-color: var(--cl-raised);
+	color: var(--cl-text);
+	border-radius: var(--cl-radius-sm);
+}
+
+/* ── Alerts, badges, toasts ───────────────────────────────────────────────── */
+
+.alert { border-radius: var(--cl-radius); border-width: 1px; }
+.alert-info    { background-color: rgba(95, 184, 196, 0.12); border-color: rgba(95, 184, 196, 0.35); color: var(--cl-text); }
+.alert-success { background-color: rgba(126, 203, 126, 0.12); border-color: rgba(126, 203, 126, 0.35); color: var(--cl-text); }
+.alert-warning { background-color: rgba(232, 161, 60, 0.12); border-color: rgba(232, 161, 60, 0.35); color: var(--cl-text); }
+.alert-danger  { background-color: rgba(226, 104, 106, 0.12); border-color: rgba(226, 104, 106, 0.35); color: var(--cl-text); }
+
+.badge {
+	font-family: var(--cl-mono);
+	font-weight: 500;
+	font-size: 10px;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	border-radius: var(--cl-radius-sm);
+	padding: 4px 7px;
+}
+.badge-primary, .badge-info { background-color: rgba(95, 184, 196, 0.18); color: var(--cl-cyan); }
+.badge-success { background-color: rgba(126, 203, 126, 0.18); color: var(--cl-green); }
+.badge-warning { background-color: rgba(232, 161, 60, 0.18); color: var(--cl-amber); }
+.badge-danger  { background-color: rgba(226, 104, 106, 0.18); color: var(--cl-red); }
+.badge-secondary, .badge-light { background-color: var(--cl-raised); color: var(--cl-muted); }
+
+#toast-container > div {
+	background-color: var(--cl-surface);
+	border: 1px solid var(--cl-border);
+	border-radius: var(--cl-radius);
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+	color: var(--cl-text);
+	opacity: 1;
+	font-family: var(--cl-sans);
+}
+#toast-container > .toast-success { border-left: 3px solid var(--cl-green); }
+#toast-container > .toast-error   { border-left: 3px solid var(--cl-red); }
+#toast-container > .toast-warning { border-left: 3px solid var(--cl-amber); }
+#toast-container > .toast-info    { border-left: 3px solid var(--cl-cyan); }
+
+/* ── Third-party widgets ──────────────────────────────────────────────────── */
+
+/* bootstrap-select, combobox, summernote, datetimepicker and daterangepicker
+   all render their own panels; without these they punch white holes. */
+.bootstrap-select .dropdown-toggle,
+.bootstrap-select > .dropdown-toggle.bs-placeholder {
+	background-color: var(--cl-bg) !important;
+	border: 1px solid var(--cl-border) !important;
+	color: var(--cl-text) !important;
+}
+.bootstrap-select .dropdown-menu li a { color: var(--cl-text); }
+.bootstrap-select .dropdown-menu li a:hover { background-color: var(--cl-raised); }
+
+.combobox-container input, .combobox-container .add-on {
+	background-color: var(--cl-bg);
+	border-color: var(--cl-border);
+	color: var(--cl-text);
+}
+
+.note-editor.note-frame,
+.note-editor .note-toolbar,
+.note-editor .note-editing-area .note-editable {
+	background-color: var(--cl-bg);
+	border-color: var(--cl-border);
+	color: var(--cl-text);
+}
+
+.bootstrap-datetimepicker-widget,
+.daterangepicker {
+	background-color: var(--cl-surface);
+	border: 1px solid var(--cl-border);
+	border-radius: var(--cl-radius);
+	color: var(--cl-text);
+}
+.bootstrap-datetimepicker-widget table td.day:hover,
+.daterangepicker td.available:hover {
+	background-color: var(--cl-raised);
+	color: var(--cl-text);
+}
+.bootstrap-datetimepicker-widget table td.active,
+.daterangepicker td.active {
+	background-color: var(--cl-cyan) !important;
+	color: #08171b !important;
+}
+.bootstrap-datetimepicker-widget table td.today::before { border-bottom-color: var(--cl-amber); }
+.daterangepicker td.off { color: var(--cl-muted); opacity: 0.45; }
+
+/* FullCalendar 3.x -- calendar and meal plan */
+.fc-unthemed th, .fc-unthemed td,
+.fc-unthemed thead, .fc-unthemed tbody,
+.fc-unthemed .fc-divider, .fc-unthemed .fc-row,
+.fc-unthemed .fc-popover, .fc-unthemed .fc-list-view,
+.fc-unthemed .fc-content, .fc-unthemed .fc-list-heading td {
+	border-color: var(--cl-border);
+}
+.fc-unthemed .fc-toolbar h2 {
+	font-family: var(--cl-sans);
+	font-weight: 500;
+	letter-spacing: -0.01em;
+	font-size: 20px;
+}
+.fc-day-header {
+	font-family: var(--cl-mono);
+	font-size: 11px;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--cl-muted);
+}
+.fc-unthemed td.fc-today,
+.fc-unthemed .fc-today {
+	background-color: rgba(232, 161, 60, 0.1);
+}
+.fc-day-number, .fc-week-number { color: var(--cl-muted); }
+/* Event colours come from grocy's own "Configure colours" screen and arrive as
+   inline styles, so they are user data, not theme. Rather than override them --
+   which would silently disable that feature -- take the edge off for the dark
+   ground. Hue semantics are preserved; only saturation and glare drop. */
+.fc-event {
+	border-radius: var(--cl-radius-sm);
+	border-width: 0 0 0 3px;
+	filter: saturate(0.72) brightness(0.82);
+}
+.fc-event:hover { filter: saturate(0.85) brightness(0.95); }
+.fc-unthemed .fc-popover { background-color: var(--cl-surface); }
+.fc-unthemed .fc-popover .fc-header { background-color: var(--cl-raised); color: var(--cl-text); }
+
+/* ── Upstream light surfaces ──────────────────────────────────────────────── */
+
+/* grocy_menu_layout.css hard-codes #f8f9fa / #e5e5e5 / #d6d6d6 / white for the
+   shell, several with !important, so these have to match that weight. Without
+   them the sidebar and content pane stay light on a dark page. */
+
+.content-wrapper,
+.night-mode .content-wrapper {
+	background: transparent;
+}
+
+#mainNav.navbar-light .navbar-collapse .navbar-sidenav,
+#mainNav.navbar-light .navbar-collapse .navbar-sidenav > .nav-item .sidenav-third-level {
+	background: transparent;
+}
+
+.sidenav-second-level,
+.sidenav-third-level {
+	background-color: var(--cl-surface) !important;
+}
+
+.navbar-nav .dropdown-menu {
+	background-color: var(--cl-surface) !important;
+}
+
+.sidenav-toggler,
+#mainNav.fixed-top .sidenav-toggler,
+#mainNav.fixed-top.navbar-light .sidenav-toggler {
+	background-color: var(--cl-surface) !important;
+}
+
+.active-page,
+#mainNav.navbar-light .navbar-collapse .navbar-sidenav li.active a {
+	background-color: var(--cl-raised) !important;
+	color: var(--cl-text) !important;
+}
+
+/* Sidebar text. Bootstrap's .navbar-light sets rgba(0,0,0,.5) and grocy repeats
+   it on deeper selectors plus `color:#000 !important` for the active item --
+   black on a dark rail, i.e. invisible. Upstream uses !important here, so
+   matching it is the only way through. */
+#mainNav .navbar-collapse,
+#mainNav .navbar-collapse .navbar-sidenav,
+#mainNav.navbar-light .navbar-collapse .navbar-sidenav,
+.navbar-sidenav {
+	background: transparent !important;
+}
+
+.navbar-light .navbar-nav .nav-link,
+#mainNav.navbar-light .navbar-collapse .navbar-sidenav > .nav-item > .nav-link,
+#mainNav.navbar-light .navbar-collapse .navbar-sidenav > .nav-item .sidenav-third-level > li > a,
+#mainNav.navbar-light .navbar-collapse .navbar-sidenav .nav-link-collapse::after,
+#mainNav.navbar-light .navbar-collapse .navbar-nav > .nav-item.dropdown > .nav-link::after {
+	color: rgba(221, 233, 231, 0.72) !important;
+}
+
+.navbar-light .navbar-nav .nav-link:hover,
+#mainNav.navbar-light .navbar-collapse .navbar-sidenav > .nav-item > .nav-link:hover,
+#mainNav.navbar-light .navbar-collapse .navbar-sidenav > .nav-item .sidenav-third-level > li > a:hover,
+#mainNav.navbar-light .navbar-collapse .navbar-sidenav li.active a,
+#mainNav.navbar-light .navbar-collapse .navbar-sidenav li.active a:hover {
+	color: var(--cl-text) !important;
+}
+
+/* Bootstrap utilities used directly in views (stockoverview uses bg-white). */
+.bg-white, .bg-light {
+	background-color: var(--cl-surface) !important;
+	color: var(--cl-text);
+}
+
+/* ── Status message pills ─────────────────────────────────────────────────── */
+
+/* Upstream gives these pale pastel fills with dark text, which glare on the
+   dark ground. Same idea -- coloured top rule, tinted body -- inverted. */
+.warning-message,
+.error-message,
+.normal-message,
+.secondary-message {
+	font-family: var(--cl-mono);
+	font-size: 12px;
+	font-weight: 500;
+	letter-spacing: 0.04em;
+	padding: 10px 14px;
+	border-top-width: 3px;
+	border-radius: 0 0 var(--cl-radius-sm) var(--cl-radius-sm);
+}
+
+.warning-message {
+	background-color: rgba(232, 161, 60, 0.12);
+	color: var(--cl-amber);
+	border-top-color: var(--cl-amber);
+}
+.error-message {
+	background-color: rgba(226, 104, 106, 0.12);
+	color: var(--cl-red);
+	border-top-color: var(--cl-red);
+}
+.normal-message {
+	background-color: rgba(95, 184, 196, 0.12);
+	color: var(--cl-cyan);
+	border-top-color: var(--cl-cyan);
+}
+.secondary-message {
+	background-color: rgba(111, 141, 144, 0.14);
+	color: var(--cl-muted);
+	border-top-color: var(--cl-muted);
+}
+
+/* ── Remaining outline buttons ────────────────────────────────────────────── */
+
+.btn-outline-dark, .btn-outline-light {
+	color: var(--cl-muted);
+	border-color: var(--cl-border);
+	background: transparent;
+}
+.btn-outline-dark:hover, .btn-outline-light:hover {
+	background-color: var(--cl-raised);
+	border-color: var(--cl-border-strong);
+	color: var(--cl-text);
+}
+.btn-outline-info { color: var(--cl-cyan); border-color: rgba(95, 184, 196, 0.5); background: transparent; }
+.btn-outline-info:hover { background-color: var(--cl-cyan); color: #08171b; border-color: var(--cl-cyan); }
+.btn-outline-success { color: var(--cl-green); border-color: rgba(126, 203, 126, 0.5); background: transparent; }
+.btn-outline-success:hover { background-color: var(--cl-green); color: #0b1c0b; border-color: var(--cl-green); }
+.btn-outline-warning { color: var(--cl-amber); border-color: rgba(232, 161, 60, 0.5); background: transparent; }
+.btn-outline-warning:hover { background-color: var(--cl-amber); color: #21140a; border-color: var(--cl-amber); }
+
+/* ── Logo ─────────────────────────────────────────────────────────────────── */
+
+/* The wordmark is a flat blue SVG loaded via <img>, so its fill cannot be
+   reached from CSS. Rotate its hue into the cyan family and lift it slightly
+   for the dark ground -- keeps grocy's mark, drops the clash. */
+/* grayscale() first discards the original blue so hue-rotate has a neutral
+   base; sepia+rotate+saturate then tints the mark into the cyan family. A
+   plain hue-rotate on the blue barely shifts it. */
+#mainNav .navbar-brand img {
+	filter: grayscale(1) brightness(1.15) sepia(1) hue-rotate(140deg) saturate(2.6);
+}
+
+/* ── Section-label motif ──────────────────────────────────────────────────── */
+
+/* The trailing-hairline heading from cappylabs.uk, available as an opt-in
+   class for anything the fork adds later. Not applied to upstream markup. */
+.cl-section-label {
+	display: flex;
+	align-items: baseline;
+	gap: 14px;
+	font-family: var(--cl-mono);
+	font-size: 12px;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+	color: var(--cl-muted);
+	margin: 40px 0 16px;
+}
+.cl-section-label::after {
+	content: "";
+	flex: 1;
+	height: 1px;
+	background: var(--cl-border);
+}
+
+@keyframes cl-led { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+.cl-led { animation: cl-led 2.6s ease-in-out infinite; color: var(--cl-green); }
+
+/* ── Reduced motion ───────────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+	a.card, .card.cursor-link, .grocy-card.cursor-link { transition: none; }
+	a.card:hover, .card.cursor-link:hover, .grocy-card.cursor-link:hover { transform: none; }
+	.cl-led { animation: none; }
+}
+
+/* ── Print ────────────────────────────────────────────────────────────────── */
+
+/* Shopping lists get printed. Force paper back to ink-on-white rather than
+   sending a dark theme to the printer. */
+@media print {
+	body, body.night-mode {
+		background: #fff !important;
+		color: #000 !important;
+		background-image: none !important;
+	}
+	.card, .table, .table th, .table td {
+		background: #fff !important;
+		color: #000 !important;
+		border-color: #999 !important;
+	}
+	.table th { color: #000 !important; }
+}

@@ -34,6 +34,18 @@
 		rel="stylesheet">
 	<link href="{{ $U('/packages/@fontsource/roboto/700.css?v=', true) }}{{ $version }}"
 		rel="stylesheet">
+	{{-- Cappy Labs theme faces. Self-hosted via @fontsource rather than fetched
+	     from Google Fonts, so a self-hosted install makes no external requests. --}}
+	<link href="{{ $U('/packages/@fontsource/space-grotesk/400.css?v=', true) }}{{ $version }}"
+		rel="stylesheet">
+	<link href="{{ $U('/packages/@fontsource/space-grotesk/500.css?v=', true) }}{{ $version }}"
+		rel="stylesheet">
+	<link href="{{ $U('/packages/@fontsource/space-grotesk/700.css?v=', true) }}{{ $version }}"
+		rel="stylesheet">
+	<link href="{{ $U('/packages/@fontsource/ibm-plex-mono/400.css?v=', true) }}{{ $version }}"
+		rel="stylesheet">
+	<link href="{{ $U('/packages/@fontsource/ibm-plex-mono/500.css?v=', true) }}{{ $version }}"
+		rel="stylesheet">
 	<link href="{{ $U('/packages/bootstrap/dist/css/bootstrap.min.css?v=', true) }}{{ $version }}"
 		rel="stylesheet">
 	<link href="{{ $U('/packages/@fortawesome/fontawesome-free/css/fontawesome.min.css?v=', true) }}{{ $version }}"
@@ -92,6 +104,11 @@
 		href="{{ $U('/css/grocy_night_mode.css?v=', true) }}{{ $version }}"
 		rel="stylesheet">
 	@endif
+
+	{{-- Cappy Labs theme. MUST stay last: night mode above is conditional, and
+	     this file is what makes the app look the same with it on or off. --}}
+	<link href="{{ $U('/css/grocy_cappylabs.css?v=', true) }}{{ $version }}"
+		rel="stylesheet">
 
 	@stack('pageStyles')
 
