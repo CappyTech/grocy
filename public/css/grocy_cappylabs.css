@@ -36,6 +36,19 @@
 
 	--cl-radius: 10px;
 	--cl-radius-sm: 4px;
+
+	/* Mono type scale. Three steps only, used consistently:
+	   micro  - table headers, field labels, badges, dropdown headers
+	   ctl    - buttons, card headers, modal titles, DataTables chrome
+	   input  - text the user typed or will type */
+	--cl-mono-micro: 11px;
+	--cl-mono-ctl: 12px;
+	--cl-mono-input: 13px;
+
+	/* Tracking scale. Wider tracking means a smaller, more label-like role. */
+	--cl-track-tight: 0.05em;  /* buttons -- read as words */
+	--cl-track: 0.12em;        /* labels and headers */
+	--cl-track-wide: 0.18em;   /* section rules */
 }
 
 /* ── Base ─────────────────────────────────────────────────────────────────── */
@@ -117,8 +130,8 @@ hr { border-top-color: var(--cl-border); }
 
 #mainNav .navbar-brand {
 	font-family: var(--cl-mono);
-	font-size: 13px;
-	letter-spacing: 0.14em;
+	font-size: var(--cl-mono-input);
+	letter-spacing: var(--cl-track);
 	text-transform: uppercase;
 	color: var(--cl-text);
 }
@@ -172,12 +185,31 @@ hr { border-top-color: var(--cl-border); }
 	border-color: var(--cl-border);
 }
 
+/* Below lg the sidebar rail becomes a drop-down panel over the page. The
+   translucent bar that works for a thin fixed header does not work for a
+   full-height menu: tinted table rows read straight through it. Opaque here,
+   translucent only where it is actually a bar. */
+@media (max-width: 991.98px) {
+	#mainNav,
+	#mainNav.navbar-light,
+	#mainNav.fixed-top {
+		background-color: var(--cl-bg) !important;
+		backdrop-filter: none;
+	}
+
+	#mainNav .navbar-collapse.show,
+	#mainNav .navbar-collapse.collapsing {
+		background-color: var(--cl-bg) !important;
+		border-top: 1px solid var(--cl-border);
+	}
+}
+
 .navbar-sidenav-tooltip.show .tooltip-inner {
 	background-color: var(--cl-raised);
 	color: var(--cl-text);
 	font-family: var(--cl-mono);
-	font-size: 11px;
-	letter-spacing: 0.06em;
+	font-size: var(--cl-mono-micro);
+	letter-spacing: var(--cl-track-tight);
 	text-transform: uppercase;
 }
 
@@ -199,8 +231,8 @@ hr { border-top-color: var(--cl-border); }
 	border-bottom: 1px solid var(--cl-border);
 	color: var(--cl-text);
 	font-family: var(--cl-mono);
-	font-size: 12px;
-	letter-spacing: 0.12em;
+	font-size: var(--cl-mono-ctl);
+	letter-spacing: var(--cl-track);
 	text-transform: uppercase;
 }
 
@@ -236,9 +268,9 @@ a.card, .card.cursor-link, .grocy-card.cursor-link {
 .table thead th,
 .table th {
 	font-family: var(--cl-mono);
-	font-size: 11px;
+	font-size: var(--cl-mono-micro);
 	font-weight: 500;
-	letter-spacing: 0.06em;
+	letter-spacing: var(--cl-track-tight);
 	text-transform: uppercase;
 	color: var(--cl-muted);
 	border-bottom: 1px solid var(--cl-border) !important;
@@ -294,7 +326,7 @@ a.card, .card.cursor-link, .grocy-card.cursor-link {
 .dataTables_wrapper .dataTables_paginate {
 	color: var(--cl-muted) !important;
 	font-family: var(--cl-mono);
-	font-size: 12px;
+	font-size: var(--cl-mono-ctl);
 }
 .dataTables_wrapper .dataTables_paginate .paginate_button {
 	color: var(--cl-muted) !important;
@@ -327,7 +359,7 @@ table.dataTable.row-border tbody th, table.dataTable.row-border tbody td {
 	border-radius: var(--cl-radius-sm);
 	color: var(--cl-text);
 	font-family: var(--cl-mono);
-	font-size: 13px;
+	font-size: var(--cl-mono-input);
 }
 
 .form-control:focus,
@@ -346,8 +378,8 @@ table.dataTable.row-border tbody th, table.dataTable.row-border tbody td {
 
 label, .col-form-label {
 	font-family: var(--cl-mono);
-	font-size: 11px;
-	letter-spacing: 0.06em;
+	font-size: var(--cl-mono-micro);
+	letter-spacing: var(--cl-track-tight);
 	text-transform: uppercase;
 	color: var(--cl-muted);
 }
@@ -365,14 +397,58 @@ label, .col-form-label {
 }
 
 input[type="checkbox"], input[type="radio"] { accent-color: var(--cl-cyan); }
+
+/* Bootstrap draws the custom control box with background-color:#fff, so an
+   UNCHECKED box is a white chip on a dark form. Only the checked state was
+   themed before; both states are needed. */
+.custom-control-label::before {
+	background-color: var(--cl-bg);
+	border-color: var(--cl-border-strong);
+}
 .custom-control-input:checked ~ .custom-control-label::before {
 	background-color: var(--cl-cyan);
 	border-color: var(--cl-cyan);
 }
+/* Bootstrap repaints checked controls green inside .was-validated via a more
+   specific selector, so a radio's SELECTED state ends up wearing a VALIDATION
+   colour. Cyan means selected; green is reserved for validity. */
+.was-validated .custom-control-input:valid:checked ~ .custom-control-label::before,
+.custom-control-input.is-valid:checked ~ .custom-control-label::before {
+	background-color: var(--cl-cyan);
+	border-color: var(--cl-cyan);
+}
+.was-validated .custom-control-input:valid ~ .custom-control-label,
+.custom-control-input.is-valid ~ .custom-control-label {
+	color: var(--cl-text);
+}
+
+.custom-control-input:not(:disabled):active ~ .custom-control-label::before {
+	background-color: var(--cl-raised);
+	border-color: var(--cl-cyan);
+}
+.custom-control-input:disabled ~ .custom-control-label { color: var(--cl-muted); }
 
 .input-group-text { color: var(--cl-muted); }
-.invalid-feedback { color: var(--cl-red); }
-.form-control.is-invalid { border-color: var(--cl-red); }
+
+/* Validation. Bootstrap's is-valid paints a full-strength green border plus an
+   inline tick on every satisfied field, which on a form this size reads as
+   alarm rather than reassurance. Success is stated quietly; only errors shout. */
+.form-control.is-valid,
+.custom-select.is-valid,
+.was-validated .form-control:valid {
+	border-color: rgba(126, 203, 126, 0.35);
+	background-image: none;
+	padding-right: 0.75rem;
+}
+.form-control.is-invalid,
+.custom-select.is-invalid,
+.was-validated .form-control:invalid {
+	border-color: var(--cl-red);
+	background-image: none;
+	padding-right: 0.75rem;
+}
+.invalid-feedback { color: var(--cl-red); font-size: var(--cl-mono-ctl); }
+.valid-feedback { color: var(--cl-green); font-size: var(--cl-mono-ctl); }
 
 .sticky-form-footer,
 .night-mode .sticky-form-footer {
@@ -386,8 +462,8 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--cl-cyan); }
 
 .btn {
 	font-family: var(--cl-mono);
-	font-size: 12px;
-	letter-spacing: 0.05em;
+	font-size: var(--cl-mono-ctl);
+	letter-spacing: var(--cl-track-tight);
 	text-transform: uppercase;
 	border-radius: var(--cl-radius-sm);
 	transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
@@ -435,10 +511,10 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--cl-cyan); }
 .btn-outline-danger { color: var(--cl-red); border-color: rgba(226, 104, 106, 0.5); background: transparent; }
 .btn-outline-danger:hover { background-color: var(--cl-red); color: #200a0b; border-color: var(--cl-red); }
 
-.btn:focus, .btn:focus-visible {
-	box-shadow: 0 0 0 2px rgba(232, 161, 60, 0.6);
-	outline: none;
-}
+/* Focus is handled once, globally -- see the focus section near the end.
+   Bootstrap's own .btn:focus ring is suppressed here so a mouse click does not
+   leave a ring stuck on the button. */
+.btn:focus { box-shadow: none; outline: none; }
 
 .btn-link { color: var(--cl-cyan); text-transform: none; font-family: var(--cl-sans); letter-spacing: normal; }
 .btn-link:hover { color: var(--cl-amber); }
@@ -492,8 +568,8 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--cl-cyan); }
 .dropdown-divider { border-top-color: var(--cl-border); }
 .dropdown-header {
 	font-family: var(--cl-mono);
-	font-size: 11px;
-	letter-spacing: 0.1em;
+	font-size: var(--cl-mono-micro);
+	letter-spacing: var(--cl-track);
 	text-transform: uppercase;
 	color: var(--cl-muted);
 }
@@ -510,8 +586,8 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--cl-cyan); }
 .modal-header, .modal-footer { border-color: var(--cl-border); }
 .modal-title {
 	font-family: var(--cl-mono);
-	font-size: 13px;
-	letter-spacing: 0.1em;
+	font-size: var(--cl-mono-input);
+	letter-spacing: var(--cl-track);
 	text-transform: uppercase;
 }
 .modal-backdrop.show { opacity: 0.7; background-color: #050c0f; }
@@ -542,8 +618,8 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--cl-cyan); }
 .badge {
 	font-family: var(--cl-mono);
 	font-weight: 500;
-	font-size: 10px;
-	letter-spacing: 0.06em;
+	font-size: var(--cl-mono-micro);
+	letter-spacing: var(--cl-track-tight);
 	text-transform: uppercase;
 	border-radius: var(--cl-radius-sm);
 	padding: 4px 7px;
@@ -631,8 +707,8 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--cl-cyan); }
 }
 .fc-day-header {
 	font-family: var(--cl-mono);
-	font-size: 11px;
-	letter-spacing: 0.06em;
+	font-size: var(--cl-mono-micro);
+	letter-spacing: var(--cl-track-tight);
 	text-transform: uppercase;
 	color: var(--cl-muted);
 }
@@ -741,9 +817,9 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--cl-cyan); }
 .normal-message,
 .secondary-message {
 	font-family: var(--cl-mono);
-	font-size: 12px;
+	font-size: var(--cl-mono-ctl);
 	font-weight: 500;
-	letter-spacing: 0.04em;
+	letter-spacing: var(--cl-track-tight);
 	padding: 10px 14px;
 	border-top-width: 3px;
 	border-radius: 0 0 var(--cl-radius-sm) var(--cl-radius-sm);
@@ -810,8 +886,8 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--cl-cyan); }
 	align-items: baseline;
 	gap: 14px;
 	font-family: var(--cl-mono);
-	font-size: 12px;
-	letter-spacing: 0.18em;
+	font-size: var(--cl-mono-ctl);
+	letter-spacing: var(--cl-track-wide);
 	text-transform: uppercase;
 	color: var(--cl-muted);
 	margin: 40px 0 16px;
@@ -825,6 +901,43 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--cl-cyan); }
 
 @keyframes cl-led { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
 .cl-led { animation: cl-led 2.6s ease-in-out infinite; color: var(--cl-green); }
+
+/* ── Focus ────────────────────────────────────────────────────────────────── */
+
+/* One focus treatment for everything, which is the point: previously buttons
+   rang amber, inputs rang cyan, and links and sidebar items had no visible
+   focus at all -- unusable by keyboard on a dark ground.
+
+   The two states say different things, matching cappylabs.uk:
+     cyan border  = this input is receiving what you type
+     amber ring   = this is where the keyboard is
+   :focus-visible rather than :focus, so clicking with a mouse does not leave
+   a ring behind. */
+a:focus-visible,
+.btn:focus-visible,
+.nav-link:focus-visible,
+.dropdown-item:focus-visible,
+.page-link:focus-visible,
+button:focus-visible,
+[role="button"]:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+.form-control:focus-visible,
+.custom-control-input:focus-visible ~ .custom-control-label::before,
+summary:focus-visible,
+[tabindex]:focus-visible {
+	outline: 2px solid var(--cl-amber);
+	outline-offset: 2px;
+	border-radius: var(--cl-radius-sm);
+}
+
+/* Skip-to-content affordance for keyboard users: grocy's sidebar is long, and
+   tabbing through every item to reach the page is the alternative. */
+#page-content:focus-visible {
+	outline: 2px solid var(--cl-amber);
+	outline-offset: -2px;
+}
 
 /* ── Reduced motion ───────────────────────────────────────────────────────── */
 
