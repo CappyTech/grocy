@@ -1,0 +1,21 @@
+# Keep build context small and prevent host state leaking into the image.
+.git
+.github
+.devtools
+.vscode
+.tx
+
+# Built inside the image (see Dockerfile). Copying host-built copies in would
+# shadow the stage outputs and could mix architectures.
+packages/
+public/packages/
+node_modules/
+
+# Never bake anyone's live database, config or uploads into an image.
+data/config.php
+data/grocy.db*
+data/storage/
+data/viewcache/
+
+# NB: do not exclude *.md -- changelog/*.md is read at runtime by
+# ApplicationService::GetChangelog() and rendered in the About dialog.

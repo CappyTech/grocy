@@ -1,0 +1,127 @@
+name: CI
+
+# Builds this fork's grocy source into an image and publishes it to GHCR,
+# following the same conventions as the other CappyTech services (hcs-app,
+# hcs-sync): master -> :latest, every build also tagged :sha-<short sha>.
+#
+# Upstream grocy ships no workflows, so nothing here collides with a
+# `git merge upstream/master`.
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build:
+    name: Build & Publish
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Derive tags
+        run: |
+          echo "IMAGE=ghcr.io/${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
+          echo "SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_ENV
+          REF_SLUG=$(echo "$GITHUB_REF_NAME" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9._-]+/-/g')
+          if [ "$GITHUB_REF_NAME" = "master" ] || [ "$GITHUB_REF_NAME" = "main" ]; then
+            echo "EXTRA_TAG=latest" >> $GITHUB_ENV
+          else
+            echo "EXTRA_TAG=branch-${REF_SLUG}" >> $GITHUB_ENV
+          fi
+          # Also surface grocy's own version so images are traceable to a release.
+          echo "GROCY_VERSION=$(sed -n 's/.*"Version": "\([^"]*\)".*/\1/p' version.json)" >> $GITHUB_ENV
+
+      # Pull requests from forks cannot read GHCR credentials, so build without
+      # pushing there -- still catches a broken Dockerfile before merge.
+      - name: Log in to GHCR
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/setup-buildx-action@v3
+
+      # Build and load locally FIRST, without pushing. The smoke test below
+      # gates publication, so a broken image can never reach :latest -- which
+      # matters because the server deploys straight from that tag.
+      - name: Build (load locally)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          load: true
+          platforms: linux/amd64
+          build-args: |
+            GIT_COMMIT=${{ env.SHORT_SHA }}
+          tags: ${{ env.IMAGE }}:sha-${{ env.SHORT_SHA }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # Boot the image against an empty data dir and assert the app actually
+      # serves. A green docker build only proves it compiled -- this catches
+      # a broken nginx/php-fpm wiring or a missing runtime file.
+      - name: Smoke test
+        run: |
+          set -euo pipefail
+          IMG="${IMAGE}:sha-${SHORT_SHA}"
+          docker run -d --name grocy-smoke -p 8099:80 \
+            -e GROCY_DEFAULT_LOCALE=en_GB -e GROCY_CURRENCY=GBP "$IMG"
+
+          for i in $(seq 1 30); do
+            code=$(curl -s -o /dev/null -w '%{http_code}' -L http://127.0.0.1:8099/ || true)
+            [ "$code" = "200" ] && break
+            sleep 2
+          done
+
+          echo "--- container logs ---"; docker logs grocy-smoke | tail -20
+
+          test "$code" = "200" || { echo "app did not become ready (last=$code)"; exit 1; }
+
+          body=$(curl -sL http://127.0.0.1:8099/)
+          echo "$body" | grep -q "Grocy.Currency = 'GBP'" \
+            || { echo "GROCY_CURRENCY not applied"; exit 1; }
+          # Guards this fork's en_GB fix: upstream's "x" would emit no locale file.
+          echo "$body" | grep -q "moment/locale/en-gb.js" \
+            || { echo "en_GB moment locale missing -- the fork patch regressed"; exit 1; }
+          curl -sf -o /dev/null http://127.0.0.1:8099/packages/moment/locale/en-gb.js \
+            || { echo "en-gb.js not served -- yarn stage output missing"; exit 1; }
+
+          echo "smoke test passed"
+          docker rm -f grocy-smoke
+
+      # Fully cached against the build above, so this only exports and pushes.
+      - name: Push
+        if: github.event_name != 'pull_request'
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          platforms: linux/amd64
+          build-args: |
+            GIT_COMMIT=${{ env.SHORT_SHA }}
+          tags: |
+            ${{ env.IMAGE }}:${{ env.EXTRA_TAG }}
+            ${{ env.IMAGE }}:sha-${{ env.SHORT_SHA }}
+            ${{ env.IMAGE }}:${{ env.GROCY_VERSION }}
+          labels: |
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.version=${{ env.GROCY_VERSION }}
+          cache-from: type=gha
+
+      - name: Summary
+        if: github.event_name != 'pull_request'
+        run: |
+          echo "Published \`${IMAGE}\`:" >> $GITHUB_STEP_SUMMARY
+          echo "- \`${EXTRA_TAG}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- \`sha-${SHORT_SHA}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- \`${GROCY_VERSION}\`" >> $GITHUB_STEP_SUMMARY
