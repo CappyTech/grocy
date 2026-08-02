@@ -214,6 +214,28 @@ hr { border-top-color: var(--cl-border); }
 	}
 }
 
+/* The white flash on sidebar hover. grocy_menu_layout.css hovers the <li>, not
+   the <a>, with `background-color: #d6d6d6 !important` and a blue
+   `inset 7px 0 0 #337ab7` bar. Theming the link alone left the row beneath it
+   flashing light grey. Same idea, theme colours: the inset bar becomes the
+   amber hover marker already used on the links. */
+.navbar-sidenav > li:hover,
+.sidenav-second-level > li:hover,
+.sidenav-third-level > li:hover,
+.navbar-nav .dropdown-item:hover,
+.navbar-sidenav > li > a:focus,
+.sidenav-second-level > li > a:focus,
+.navbar-nav .dropdown-item:focus {
+	background-color: var(--cl-surface) !important;
+	box-shadow: inset 3px 0 0 var(--cl-amber) !important;
+}
+
+/* Current page marker: cyan, matching the active nav-link border. */
+.active-page {
+	background-color: var(--cl-raised) !important;
+	box-shadow: inset 3px 0 0 var(--cl-cyan) !important;
+}
+
 .navbar-sidenav-tooltip.show .tooltip-inner {
 	background-color: var(--cl-raised);
 	color: var(--cl-text);

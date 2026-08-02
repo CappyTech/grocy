@@ -555,6 +555,12 @@
 								</label>
 							</div>
 						</div>
+						{{-- Night mode settings are hidden: this fork does not load
+						     grocy_night_mode.css (see the head of this file), so the theme
+						     is dark unconditionally and these controls change nothing.
+						     Kept behind a false condition rather than deleted so upstream
+						     edits inside the block still merge cleanly. --}}
+						@if(false)
 						<div class="dropdown-divider"></div>
 						<div class="dropdown-item pt-0">
 							<div>
@@ -627,6 +633,7 @@
 								</label>
 							</div>
 						</div>
+						@endif
 						<div class="dropdown-divider"></div>
 						<div class="dropdown-item">
 							<div class="form-check">
